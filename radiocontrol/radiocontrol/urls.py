@@ -4,8 +4,9 @@ from django.contrib import admin
 admin.autodiscover()
 
 urlpatterns = patterns('',
-    # Examples:
-    url(r'^$', include('control.urls')),
+    # forward all urls to control
+    url(r'^', include('control.urls')),
+
     # url(r'^radiocontrol/', include('radiocontrol.foo.urls')),
 
     # Uncomment the admin/doc line below to enable admin documentation:

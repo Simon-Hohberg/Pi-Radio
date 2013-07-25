@@ -4,13 +4,53 @@
     <meta charset=utf-8">
     <title>Pi Radio</title>
 
-<!--    <link rel="stylesheet" href="css/reset.css" media="screen, projection"/> -->
+    {% load staticfiles %}
 
+    <link rel="stylesheet" href="{% static "jquery-ui-1.10.3.custom/css/smoothness/jquery-ui-1.10.3.custom.min.css" %}" media="screen, projection"/>
+    <link rel="stylesheet" href="{% static "css/radio.css" %}" media="screen, projection"/>
 
-<!--   <script src="{{STATIC_URL}}js/jquery-1.6.1.min.js"></script> -->
+    <script src="{% static "jquery-ui-1.10.3.custom/js/jquery-1.9.1.js" %}"></script>
+    <script src="{% static "jquery-ui-1.10.3.custom/js/jquery-ui-1.10.3.custom.min.js" %}"></script>
+    <script src="{% static "js/radio.js" %}"></script>
+
+    <script>
+        $(function() {
+            $( "#tabs" ).tabs();
+            $( "#play" ).button({
+                icons: { primary: "ui-icon-play" },
+                text: false
+            });
+        });
+    </script>
 
 </head>
 <body>
+    <div id="header" class="header">
+        <h2>Pi Radio</h2>
+    </div>
+
+    <div id="tabs">
+         <ul>
+             <li><a href="#tabs-1">Radio Stations</a></li>
+             <li><a href="#tabs-2">Settings</a></li>
+             <li><a href="#tabs-3">Status</a></li>
+         </ul>
+         <div id="tabs-1">
+         </div>
+         <div id="tabs-2">
+         </div>
+         <div id="tabs-3">
+         </div>
+    </div>
+
+    <div class="control-panel-wrapper">
+         <div id="control-panel">
+             <div id="control-info" class="marquee">
+                <span id="info-text">Now playing Fritz Radio...</span>
+             </div>
+             <button id="play" class="control-button" onclick="play(function(data) {console.log(data)})">Play</button>
+         </div>
+    </div>
 </body>
 </html>
 

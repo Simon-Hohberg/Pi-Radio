@@ -1,0 +1,69 @@
+.control-button {
+    width: 1.5em !important;
+    height: 1.5em;
+}
+
+.control-panel-wrapper {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    text-align: center;
+}
+
+.control-panel {
+    margin-left: auto;
+    margin-right: auto;
+    width: 20em;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #DDDDDD;
+}
+
+.marquee {
+    margin-left: auto;
+    margin-right: auto;
+    width: 20em;
+    overflow:hidden;
+}
+
+.marquee span{
+font:1em courier, sans-serif;
+padding-left:10px;
+white-space: nowrap;
+display:inline;
+position: relative;
+left:0%;
+-moz-animation: marquee 15s infinite linear 3s;
+-webkit-animation: marquee 15s infinite linear 3s;
+-o-animation: marquee 15s infinite linear 3s;
+animation: marquee 15s infinite linear 3s;
+}
+
+.marquee:hover span{
+-webkit-animation-play-state: paused;
+-moz-animation-play-state: paused;
+-o-animation-play-state: paused;
+animation-play-state: paused;
+}
+
+.marquee span:after {
+content:attr(rel); display:inline; color:black; padding-left:10px;}
+@-webkit-keyframes marquee{
+0% {left: 0%;}
+100% {left: -50%;}
+}
+
+@-moz-keyframes marquee{
+0% {left: 0%;}
+100% {left: -50%;}
+}
+
+@-o-keyframes marquee{
+0% {left: 0%;}
+100% {left: -50%;}
+}
+
+@keyframes marquee{
+0% {left: 0%;}
+100% {left: -50%;}
+}
