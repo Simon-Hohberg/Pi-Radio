@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset=utf-8">
     <title>Pi Radio</title>
 
     {% load staticfiles %}
@@ -12,6 +11,7 @@
     <script src="{% static "jquery-ui-1.10.3.custom/js/jquery-1.9.1.js" %}"></script>
     <script src="{% static "jquery-ui-1.10.3.custom/js/jquery-ui-1.10.3.custom.min.js" %}"></script>
     <script src="{% static "js/radio.js" %}"></script>
+    <script src="{% static "js/stations.js" %}"></script>
 
     <script>
         $(function() {
@@ -26,29 +26,40 @@
 </head>
 <body>
     <div id="header" class="header">
-        <h2>Pi Radio</h2>
+        <div id="title" style="float: left; margin-left: 0.5em">
+            <h2>Pi Radio</h2>
+        </div>
+        <div class="centered-header-elem" style="float: left;">
+            <button id="play" class="control-button" onclick="play( function(data) { console.log(data) } )">Play</button>
+        </div>
+        <div id="control-info" class="marquee centered-header-elem" style="float: left">
+            <span id="info-text">Now playing Fritz Radio...</span>
+        </div>
     </div>
 
-    <div id="tabs">
+    <div id="tabs" style="clear: both">
          <ul>
-             <li><a href="#tabs-1">Radio Stations</a></li>
+             <li><a href="#radio-stations">Radio Stations</a></li>
              <li><a href="#tabs-2">Settings</a></li>
              <li><a href="#tabs-3">Status</a></li>
          </ul>
-         <div id="tabs-1">
+         
+         <div id="radio-stations">
+                <ul id="station-list" style="list-style-type: none; ">
+                    <li class="ui-state-default" id="station-template" style="display: none">
+                        <label>Template</label>
+                        <input type="text" />
+                        <a href="" style="float: right">
+                            <span class="ui-icon ui-icon-close"></span>
+                        </a>
+                    </li>
+                </ul>
          </div>
+         
          <div id="tabs-2">
          </div>
+         
          <div id="tabs-3">
-         </div>
-    </div>
-
-    <div class="control-panel-wrapper">
-         <div id="control-panel">
-             <div id="control-info" class="marquee">
-                <span id="info-text">Now playing Fritz Radio...</span>
-             </div>
-             <button id="play" class="control-button" onclick="play(function(data) {console.log(data)})">Play</button>
          </div>
     </div>
 </body>

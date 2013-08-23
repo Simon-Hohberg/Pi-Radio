@@ -14,6 +14,7 @@ def radio_state(request):
     return HttpResponse(json.dumps(response), mimetype="application/json")
     
 
+
 def play(request):
     mpc = os.popen("mpc play")
     state = mpc.read()
@@ -45,11 +46,14 @@ def get_volume():
 
 
 def remove(request):
+    # TODO
     return HttpResponse(status=400)
 
 def add(request):
+    # TODO
     return HttpResponse(status=400)
 
 def move(request):
+    # TODO
     return HttpResponse(status=400)
 
