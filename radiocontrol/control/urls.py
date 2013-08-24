@@ -10,6 +10,8 @@ urlpatterns = patterns('',
     url(r'^add/$', views.add, name='add'),
     url(r'^move/$', views.move, name='move'),
     url(r'^radioState/$', views.radio_state, name='radio_state'),
+    url(r'^updateStationList/$', views.update_station_list, name='update_station_list'),
+    url(r'^stationList/$', views.get_station_list, name='get_station_list'),
 
     url(r'^$', views.index, name='index'),
 )

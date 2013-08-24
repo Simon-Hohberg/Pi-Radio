@@ -12,7 +12,6 @@ def radio_state(request):
     station = get_current_station()
     response = dict(volume=volume, station=station)
     return HttpResponse(json.dumps(response), mimetype="application/json")
-    
 
 
 def play(request):
@@ -33,6 +32,27 @@ def get_current_station():
     mpc = os.popen("mpc current")
     station = mpc.read().strip()
     return station
+
+
+def get_station_list(request):
+    try:
+        stations_file = open("stations.radio", "r")
+        station_list = map(str.strip, list(stations_file))
+        stations_file.close()
+    except IOError:
+        station_list = []
+    return HttpResponse(json.dumps(station_list), mimetype="application/json")
+
+def update_station_list(request):
+    if request.method == "POST":
+        station_list = json.loads(request.raw_post_data)
+        # creates file, overwrites old file
+        stations_file = open("stations.radio", "w+")
+        for station in station_list:
+            stations_file.write(station + "\n")
+        stations_file.close();
+        return HttpResponse(status=200)
+    return HttpResponse(status=400)
 
 
 def volume(request):
