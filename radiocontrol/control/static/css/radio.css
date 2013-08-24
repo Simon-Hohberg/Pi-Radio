@@ -1,3 +1,7 @@
+body {
+    font-family: sans-serif;
+}
+
 .header {
     height: 4em;
     z-index: 10;
@@ -13,6 +17,10 @@
     top: 50%;
     margin-top: -0.6em;
     margin-left: 0.5em;
+}
+
+.info-text {
+    font-size: 14pt;
 }
 
 .control-button {
@@ -37,50 +45,75 @@
 }
 
 .marquee {
+    border-width: 1px;
+    border-style: solid;
+    border-color: #DDDDDD;
+    padding: 0.5em;
     margin-left: auto;
     margin-right: auto;
-    width: 20em;
-    overflow:hidden;
+    position: absolute;
+    top: 1.3em;
+    left: 15%;
+    right: 25%;
+    width: 50%;
+    overflow: hidden;
 }
 
-.marquee span{
-font:1em courier, sans-serif;
-padding-left:10px;
-white-space: nowrap;
-display:inline;
-position: relative;
-left:0%;
--moz-animation: marquee 15s infinite linear 3s;
--webkit-animation: marquee 15s infinite linear 3s;
--o-animation: marquee 15s infinite linear 3s;
-animation: marquee 15s infinite linear 3s;
-}
 
-.marquee:hover span{
--webkit-animation-play-state: paused;
--moz-animation-play-state: paused;
--o-animation-play-state: paused;
-animation-play-state: paused;
-}
+/* ================ */
+/* = Fake Marquee = */
+/* ================ */
 
-.marquee span:after {
-content:attr(rel); display:inline; color:black; padding-left:10px;}
+/* We need this to float so the dimension will be exactly that of the contents. */
+.marquee.fake{
+  overflow: hidden;
+  position: relative;
+  float: left;
+}
+                    
+/* The sliding span */
+.marquee.fake span{
+  word-wrap: nowrap;                
+  display: inline-block;
+  position: relative;
+  left: -100%;
+                
+  -moz-animation-name: marquee;
+  -webkit-animation-name: marquee;              
+
+  /* Set the duration, s = seconds */
+  -moz-animation-duration: 15s;
+  -webkit-animation-duration: 15s;      
+  
+  /* How many times the animation to repeat */
+  -moz-animation-iteration-count: infinite;
+  -webkit-animation-iteration-count: infinite;                        
+
+  /* Several options available, use linear for this example */
+  -moz-animation-timing-function: linear;
+  -webkit-animation-timing-function: linear;     
+}
+              
+/* Stop the marquee on :hover */
+.marquee.fake:hover span{
+  -webkit-animation-play-state: paused;
+  -moz-animation-play-state: paused;
+}              
+            
 @-webkit-keyframes marquee{
-0% {left: 0%;}
-100% {left: -50%;}
+  0% {
+    left: 100%;
+  }
+  100% {
+    left: -100%;
+  }
 }
-
+              
 @-moz-keyframes marquee{
-0% {left: 0%;}
-100% {left: -50%;}
-}
-
-@-o-keyframes marquee{
-0% {left: 0%;}
-100% {left: -50%;}
-}
-
-@keyframes marquee{
-0% {left: 0%;}
-100% {left: -50%;}
+  0% {
+    left: 100%;
+  }
+  100% {
+    left: -100%;
+  }
 }
