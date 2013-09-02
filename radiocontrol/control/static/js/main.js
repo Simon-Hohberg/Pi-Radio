@@ -14,7 +14,7 @@ $(function() {
         if (radio.isPlaying) {
             stop( function (data) {
                 $( "#play" ).button({
-                      icons: { primary: "ui-icon-pause" },
+                      icons: { primary: "ui-icon-play" },
                       text: false
                 });
                 radio.isPlaying = false;
@@ -22,7 +22,7 @@ $(function() {
         } else {
             play( function(data) {
                 $( "#play" ).button({
-                      icons: { primary: "ui-icon-play" },
+                      icons: { primary: "ui-icon-pause" },
                       text: false
                 });
                 radio.isPlaying = true;
