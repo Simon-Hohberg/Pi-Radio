@@ -1,0 +1,28 @@
+=== Pi Radio ===
+
+== Raspbian ==
+
+Installation
+
+- disable boot to desktop
+- enable ssh
+- set pi password
+- memory splitting
+- set locals (language, timezone, keyboard)
+
+wlan config rtl8191SU (module r8712u)
+
+/etc/network/interfaces
+
+auto wlan0
+iface wlan0 inet dhcp
+wpa-conf /etc/wpa.conf
+
+
+/etc/wpa.conf
+network={
+ssid="<put ssid here>"
+key_mgmt=WPA-PSK
+pairwise=CCMP TKIP
+group=CCMP TKIP
+psk="<plain key goes here>" or <generated wpa psk> (user wpa_passphrase ssid passphrase)

@@ -41,7 +41,7 @@ $.ajaxSetup({
 
 function getRadioState(callback) {
     $.get(
-        "radioState",
+        "radioState/",
         {},
         callback
     );
@@ -61,37 +61,20 @@ function getVolume() {
 
 // ------------------------------- radio control -------------------------------
 
-function play() {
+function play(callback) {
     $.get(
-        "play",
+        "play/",
         {},
-        playCallback
+        callback
     );
 }
 
-function playCallback(data) {
-    $( "#play" ).button({
-          icons: { primary: "ui-icon-pause" },
-          text: false
-    });
-    $( "#play" ).click(stop);
-}
-
-
-function stop() {
+function stop(callback) {
     $.get(
-        "stop",
+        "stop/",
         {},
-        stopCallback
+        callback
     );
-}
-
-function stopCallback(data) {
-    $( "#play" ).button({
-          icons: { primary: "ui-icon-play" },
-          text: false
-    });   
-    $( "#play" ).click(play);
 }
 
 
