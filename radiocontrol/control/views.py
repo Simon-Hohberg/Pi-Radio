@@ -7,6 +7,7 @@ import string
 def index(request):
     return render(request, template_name='index.html')
 
+# -------- State --------------------------------------------------------------
 def radio_state(request):
     volume = get_volume()
     station = get_current_station()
@@ -14,16 +15,20 @@ def radio_state(request):
     return HttpResponse(json.dumps(response), mimetype="application/json")
 
 
+# -------- Play ---------------------------------------------------------------
 def play(request):
     mpc = os.popen("mpc play")
     state = mpc.read()
     return HttpResponse(json.dumps(state), mimetype="application/json")
 
+
+# -------- Stop ---------------------------------------------------------------
 def stop(request):
     os.system("mpc stop")
     return HttpResponse(status=200)
 
 
+# -------- Station ------------------------------------------------------------
 def current_station(request):
     station = get_current_station()
     return HttpResponse(json.dumps(station), mimetype="application/json")
@@ -34,10 +39,14 @@ def get_current_station():
     return station
 
 
+# -------- Station List--------------------------------------------------------
 def get_station_list(request):
     try:
         stations_file = open("stations.radio", "r")
-        station_list = map(str.strip, list(stations_file))
+        station_list = []
+        for line in stations_file:
+            splitted = line.split(',')
+            station_list.append((splitted[0], splitted[1]))
         stations_file.close()
     except IOError:
         station_list = []
@@ -49,12 +58,13 @@ def update_station_list(request):
         # creates file, overwrites old file
         stations_file = open("stations.radio", "w+")
         for station in station_list:
-            stations_file.write(station + "\n")
+            stations_file.write(station[0] + ',' + station[1] + '\n')
         stations_file.close();
         return HttpResponse(status=200)
     return HttpResponse(status=400)
 
 
+# -------- Voluem -------------------------------------------------------------
 def volume(request):
     volume = get_volume()
     return HttpResponse(json.dumps(volume), mimetype="application/json")
@@ -63,17 +73,3 @@ def get_volume():
     mpc = os.popen("mpc volume")
     volume = mpc.read().replace("volume:", "").strip()
     return volume
-
-
-def remove(request):
-    # TODO
-    return HttpResponse(status=400)
-
-def add(request):
-    # TODO
-    return HttpResponse(status=400)
-
-def move(request):
-    # TODO
-    return HttpResponse(status=400)
-
