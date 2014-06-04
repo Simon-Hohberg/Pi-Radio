@@ -32,8 +32,8 @@ class Controls:
         controls_str = "     Station: " + str(self.station) + "\n" \
                      + "      Volume: " + str(self.volume) + "\n" \
                      + "Audio Source: " + str(self.ext_audio_switch) + "\n" \
-                     + "       LED 1: " + ("on" if led1 else "off") + "\n" \
-                     + "       LED 2: " + ("on" if led2 else "off") + "\n"
+                     + "       LED 1: " + ("on" if self.led1 else "off") + "\n" \
+                     + "       LED 2: " + ("on" if self.led2 else "off") + "\n"
         return controls_str
 
 class ControlsThread(threading.Thread):
@@ -57,8 +57,8 @@ class ControlsThread(threading.Thread):
             
             self.controls.lock.acquire()
             
-            self.controls.station = readadc(STATION_ADC, SPICLK, SPIMOSI, SPIMISO, SPICS)
-            self.controls.volume = readadc(VOLUME_ADC, SPICLK, SPIMOSI, SPIMISO, SPICS)
+            self.controls.station = readadc(STATION_ADC)
+            self.controls.volume = readadc(VOLUME_ADC)
             self.controls.ext_audio_switch = GPIO.input(EXT_AUDIO_SWITCH)
             GPIO.output(LED_1, self.controls.led1)
             GPIO.output(LED_2, self.controls.led2)
