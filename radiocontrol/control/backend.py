@@ -3,6 +3,8 @@ from array import array
 import threading
 from control.singleton import Singleton
 from threading import Lock
+from control.controls import Controls, ControlsThread
+import os
 
 @Singleton
 class Backend():
@@ -13,6 +15,9 @@ class Backend():
         self.station_file_lock = Lock()
         
         self.stations = self.read_stations()
+
+	for s in self.stations:
+            os.system('mpc add ' + s[1])
         
         # create controls and thread for interfacing
         self.controls = Controls()
@@ -73,9 +78,9 @@ class Backend():
         if self.controls.station_updated:
             self.switch_station(self.controls.station)
         if self.controls.volume_updated:
-            self.set_volume(self.control.volume)
+            self.set_volume(self.controls.volume)
         if self.controls.ext_as_updated:
-            self.set_audio_source(self.controls.ext_audio_source)
+            self.set_ext_audio_source(self.controls.ext_audio_source)
         
         self.controls.lock.release()
     

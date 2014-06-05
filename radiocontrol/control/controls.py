@@ -1,8 +1,8 @@
 import time
 import os
 import RPi.GPIO as GPIO
-from numpy.ma.core import floor
-from threading import Lock
+from math import floor
+from threading import Lock, Thread
 
 # change these as desired - they're the pins connected from the
 # SPI port on the ADC to the Cobbler
@@ -44,14 +44,13 @@ class Controls:
         self.update_callback = update_callback
     
     def set_station(self, station):
-        station_id = floor(floor(station / 1023.) * (self.num_stations - 1)) + 1
+        station_id = int(floor((station / 1023.) * (self.num_stations - 1)) + 1)
         # when the current poti position is more than the tolerance away from
         # the actual station postion no station is selected (so there is a 
         # margin between the stations)
-        if abs((staion_id / self.num_stations) * 1023 - station) > STATION_TOLERANCE:
-            self.station = 0
-            self.station_updated = True
-        elif station_id != self.station:
+        if abs((float(station_id) / self.num_stations) * 1023 - station) > STATION_TOLERANCE:
+            station_id = 0
+        if station_id != self.station:
             self.station = station_id
             self.station_updated = True
         self.updated |= self.station_updated
@@ -59,7 +58,7 @@ class Controls:
     def set_volume(self, volume):
         adjust = abs(volume - self.volume * 1023./100)
         if adjust > VOLUME_TOLERACE:
-            self.volume = round(volume * 100 / 1023)
+            self.volume = int(round(volume * 100. / 1023))
             self.volume_updated = True
         self.updated |= self.volume_updated
     
@@ -70,19 +69,24 @@ class Controls:
         self.updated |= self.ext_as_updated
     
     def notify(self):
-        if self.update_callback != None:
-            self.update_callback()
+        if self.updated:
+            self.updated = False
+            if self.update_callback != None:
+                self.update_callback()
+                self.volume_updated = False
+                self.station_updated = False
+                self.ext_as_updated = False
     
     def __str__(self):
         controls_str = "     Station: " + str(self.station) + "\n" \
                      + "      Volume: " + str(self.volume) + "\n" \
                      + "Audio Source: " + ("external" if self.ext_audio_source else "radio") + "\n" \
-                     + "       LED 1: " + ("on" if led1 else "off") + "\n" \
-                     + "       LED 2: " + ("on" if led2 else "off") + "\n"
+                     + "       LED 1: " + ("on" if self.led1 else "off") + "\n" \
+                     + "       LED 2: " + ("on" if self.led2 else "off") + "\n"
         return controls_str
 
 
-class ControlsThread(threading.Thread):
+class ControlsThread(Thread):
     
     def __init__(self, controls):
         GPIO.setmode(GPIO.BCM)
@@ -103,8 +107,8 @@ class ControlsThread(threading.Thread):
             
             self.controls.lock.acquire()
             
-            self.controls.set_station(readadc(STATION_ADC, SPICLK, SPIMOSI, SPIMISO, SPICS))
-            self.controls.set_volume(readadc(VOLUME_ADC, SPICLK, SPIMOSI, SPIMISO, SPICS))
+            self.controls.set_station(readadc(STATION_ADC))
+            self.controls.set_volume(readadc(VOLUME_ADC))
             self.controls.set_ext_audio_source(GPIO.input(EXT_AUDIO_SWITCH))
             GPIO.output(LED_1, self.controls.led1)
             GPIO.output(LED_2, self.controls.led2)
