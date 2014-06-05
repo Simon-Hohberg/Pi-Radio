@@ -1,4 +1,4 @@
-function Station(index, uri) {
+function Station(index, name, uri) {
     var self = this;
     
     this.setLabel = function (text) {
@@ -16,7 +16,11 @@ function Station(index, uri) {
     };
     
     this.getURI = function() {
-        return $("input", this.widget).val();
+        return $("#radio-uri", this.widget).val();
+    };
+    
+    this.getName = function() {
+        return $("#radio-name", this.widget).val();
     };
     
     this.index = index;
@@ -25,8 +29,10 @@ function Station(index, uri) {
     this.widget.css( "display", "block" );
     this.widget.removeAttr( "id" );
     $( "#station-list" ).append( this.widget );
-    if (uri)
-        $("input", this.widget).val(uri);
+    
+    $("#radio-name", this.widget).val(name);
+    $("#radio-uri", this.widget).val(uri);
+    
     // TODO add on change listener or introduce "apply" button
     this.setLabel((index + 1) + " - ");
 }

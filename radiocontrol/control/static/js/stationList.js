@@ -1,10 +1,10 @@
-function StationList(urls, stationMax) {
+function StationList(data, stationMax) {
     
     var self = this;
     
-    this.addStation = function (uri) {
+    this.addStation = function (name, uri) {
         if (this.stations.length < this.max) {
-            var station = new Station(this.stations.length, uri);
+            var station = new Station(this.stations.length, name, uri);
             this.stations.push(station);
             station.setOnRemoveListener(self.removeStation);
         } else {
@@ -75,8 +75,8 @@ function StationList(urls, stationMax) {
     
     this.stations = [];
     this.max = stationMax;
-    for (var i = 0; i < urls.length; i++) {
-        this.addStation(urls[i]);
+    for (var i = 0; i < data.length; i++) {
+        this.addStation(data[i][0], data[i][1]);
     }
     
     $( "#station-list" ).disableSelection();

@@ -51,11 +51,7 @@ function updateRadioState(data) {
     if (data.station != "")
         $("#info-text").text("// Now Playing // " + data.station);
     else
-        $("#info-text").text("// Radio stopped //");
-}
-
-function getVolume() {
-
+        $("#info-text").text("// Radio stopped //");l
 }
 
 

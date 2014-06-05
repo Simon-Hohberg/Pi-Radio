@@ -1,7 +1,8 @@
-import threading
 import time
 import os
 import RPi.GPIO as GPIO
+from numpy.ma.core import floor
+from threading import Lock
 
 # change these as desired - they're the pins connected from the
 # SPI port on the ADC to the Cobbler
@@ -17,24 +18,69 @@ LED_2 = 24
 STATION_ADC = 0
 VOLUME_ADC = 1
 
+STATION_TOLERANCE = 20
+VOLUME_TOLERACE = 5
 
 class Controls:
     
-    def __init__(self):
-        self.station = 0;
-        self.volume = 0;
-        self.ext_audio_switch = 0;
-        self.led1 = False;
-        self.led2 = False;
-        self.lock = threading.Lock()
+    def __init__(self, num_stations=10, num_volume_lvls=20):
+        self.lock = Lock()
+        self.update_callback = None
+        self.num_stations = num_stations
+        self.num_volume_lvls = num_volume_lvls
+        # value between 1 and num_stations or 0 if no station is selected
+        self.station = 1
+        # volume in percent
+        self.volume = 0
+        self.ext_audio_source = False
+        self.led1 = False
+        self.led2 = False
+        self.updated = False
+        self.station_updated = False
+        self.volume_updated = False
+        self.ext_as_updated = False
+    
+    def set_update_callback(self, update_callback):
+        self.update_callback = update_callback
+    
+    def set_station(self, station):
+        station_id = floor(floor(station / 1023.) * (self.num_stations - 1)) + 1
+        # when the current poti position is more than the tolerance away from
+        # the actual station postion no station is selected (so there is a 
+        # margin between the stations)
+        if abs((staion_id / self.num_stations) * 1023 - station) > STATION_TOLERANCE:
+            self.station = 0
+            self.station_updated = True
+        elif station_id != self.station:
+            self.station = station_id
+            self.station_updated = True
+        self.updated |= self.station_updated
+    
+    def set_volume(self, volume):
+        adjust = abs(volume - self.volume * 1023./100)
+        if adjust > VOLUME_TOLERACE:
+            self.volume = round(volume * 100 / 1023)
+            self.volume_updated = True
+        self.updated |= self.volume_updated
+    
+    def set_ext_audio_source(self, ext_audio_source):
+        if ext_audio_source != self.ext_audio_source:
+            self.ext_audio_source = ext_audio_source
+            self.ext_as_updated = True
+        self.updated |= self.ext_as_updated
+    
+    def notify(self):
+        if self.update_callback != None:
+            self.update_callback()
     
     def __str__(self):
         controls_str = "     Station: " + str(self.station) + "\n" \
                      + "      Volume: " + str(self.volume) + "\n" \
-                     + "Audio Source: " + str(self.ext_audio_switch) + "\n" \
+                     + "Audio Source: " + ("external" if self.ext_audio_source else "radio") + "\n" \
                      + "       LED 1: " + ("on" if led1 else "off") + "\n" \
                      + "       LED 2: " + ("on" if led2 else "off") + "\n"
         return controls_str
+
 
 class ControlsThread(threading.Thread):
     
@@ -57,15 +103,17 @@ class ControlsThread(threading.Thread):
             
             self.controls.lock.acquire()
             
-            self.controls.station = readadc(STATION_ADC, SPICLK, SPIMOSI, SPIMISO, SPICS)
-            self.controls.volume = readadc(VOLUME_ADC, SPICLK, SPIMOSI, SPIMISO, SPICS)
-            self.controls.ext_audio_switch = GPIO.input(EXT_AUDIO_SWITCH)
+            self.controls.set_station(readadc(STATION_ADC, SPICLK, SPIMOSI, SPIMISO, SPICS))
+            self.controls.set_volume(readadc(VOLUME_ADC, SPICLK, SPIMOSI, SPIMISO, SPICS))
+            self.controls.set_ext_audio_source(GPIO.input(EXT_AUDIO_SWITCH))
             GPIO.output(LED_1, self.controls.led1)
             GPIO.output(LED_2, self.controls.led2)
             
             print(self.controls)
             
             self.controls.lock.release()
+            
+            self.controls.notify()
             time.sleep(0.5)
 
 

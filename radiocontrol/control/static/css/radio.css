@@ -44,6 +44,14 @@ body {
     border-color: #DDDDDD;
 }
 
+.radio-name {
+    
+}
+
+.radio-uri {
+    font-family: Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New, monospace;
+}
+
 .marquee {
     border-width: 1px;
     border-style: solid;
