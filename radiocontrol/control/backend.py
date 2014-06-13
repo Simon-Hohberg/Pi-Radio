@@ -1,6 +1,5 @@
 from multiprocessing.connection import Listener
 from array import array
-import threading
 from control.singleton import Singleton
 from threading import Lock
 from control.controls import Controls, ControlsThread
