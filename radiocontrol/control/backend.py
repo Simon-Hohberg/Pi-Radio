@@ -117,7 +117,7 @@ class Backend():
     # -------- Volume ---------------------------------------------------------
     def set_volume(self, new_volume):
         self.mpc_lock.acquire()
-        os.system("mpc volume " + str(new_volume))
+        os.system("amixer set Headphone " + str(new_volume) + "%")
         self.mpc_lock.release()
     
     def get_volume(self):
