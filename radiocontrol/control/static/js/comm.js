@@ -48,10 +48,11 @@ function getRadioState(callback) {
 }
 
 function updateRadioState(data) {
+    console.log("got station: " + data.station);
     if (data.station != "")
         $("#info-text").text("// Now Playing // " + data.station);
     else
-        $("#info-text").text("// Radio stopped //");l
+        $("#info-text").text("// Radio stopped //");
 }
 
 

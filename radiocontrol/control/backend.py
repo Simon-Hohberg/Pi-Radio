@@ -23,7 +23,7 @@ class Backend():
         self.controls.set_update_callback(self.update)
         
         controls_thread = ControlsThread(self.controls)
-        controls_thread.run()
+        controls_thread.start()
         
         # start the radio
         self.play()
@@ -72,6 +72,7 @@ class Backend():
         Called when the controls of the radio change, i.e. station, volume, 
         audio source switch.
         '''
+        # > lock
         self.controls.lock.acquire()
         
         if self.controls.station_updated:
@@ -81,6 +82,7 @@ class Backend():
         if self.controls.ext_as_updated:
             self.set_ext_audio_source(self.controls.ext_audio_source)
         
+        # < release
         self.controls.lock.release()
     
     
@@ -90,27 +92,33 @@ class Backend():
             # TODO: play noise
             True;
         else:
+            # > lock
             self.mpc_lock.acquire()
             mpc = os.popen("mpc play " + str(new_station))
+            # < release
             self.mpc_lock.release()
     
     def play(self):
+        # > lock
         self.controls.lock.acquire()
         self.switch_station(self.controls.station)
+        # < release
         self.controls.lock.release()
     
     
     # -------- State ----------------------------------------------------------
     def get_state(self):
-        volume = get_volume()
-        station = get_current_station()
+        volume = self.get_volume()
+        station = self.get_current_station()
         return dict(volume=volume, station=station)
     
     
     # -------- Stop -----------------------------------------------------------
     def stop(self):
+        # > lock
         self.mpc_lock.acquire()
         os.system("mpc stop")
+        # < release
         self.mpc_lock.release()
     
     

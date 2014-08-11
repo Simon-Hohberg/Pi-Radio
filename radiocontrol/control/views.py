@@ -10,14 +10,14 @@ def index(request):
 # -------- State --------------------------------------------------------------
 def radio_state(request):
     response = Backend.Instance().get_state()
-    return HttpResponse(response, mimetype="application/json")
+    return HttpResponse(json.dumps(response), mimetype="application/json")
 
 
 # -------- Play ---------------------------------------------------------------
 def play(request):
     backend = Backend.Instance()
     backend.play()
-    response = backend.get_state()
+    state = backend.get_state()
     return HttpResponse(json.dumps(state), mimetype="application/json")
 
 

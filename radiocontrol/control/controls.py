@@ -89,6 +89,7 @@ class Controls:
 class ControlsThread(Thread):
     
     def __init__(self, controls):
+        Thread.__init__(self)
         GPIO.setmode(GPIO.BCM)
         # set up the SPI interface pins
         GPIO.setup(SPIMOSI, GPIO.OUT)
@@ -113,7 +114,7 @@ class ControlsThread(Thread):
             GPIO.output(LED_1, self.controls.led1)
             GPIO.output(LED_2, self.controls.led2)
             
-            print(self.controls)
+ #           print(self.controls)
             
             self.controls.lock.release()
             
