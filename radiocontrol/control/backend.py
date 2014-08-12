@@ -66,6 +66,7 @@ class Backend():
         
         return station_list
     
+    
     def write_stations(self, station_list):
         self.stations = station_list
         # > lock
@@ -79,6 +80,7 @@ class Backend():
         
         # < release
         self.station_file_lock.release()
+    
     
     def get_station_list(self):
         return self.stations
@@ -127,6 +129,7 @@ class Backend():
             # < release
             self.mpc_lock.release()
     
+    
     def play(self):
         # > lock
         self.controls.lock.acquire()
@@ -158,6 +161,7 @@ class Backend():
         sub.call(['amixer', '-c', '0', 'sset', 'Headphone', str(new_volume) + '%'], stdout=FNULL)
         # < release
         self.amixer_lock.release()
+    
     
     def get_volume(self):
         # > lock
