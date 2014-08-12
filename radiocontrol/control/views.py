@@ -34,7 +34,7 @@ def current_station(request):
 
 
 # -------- Station List--------------------------------------------------------
-def get_station_list(request):
+def station_list(request):
     station_list = Backend.Instance().get_station_list()
     return HttpResponse(json.dumps(station_list), mimetype="application/json")
 

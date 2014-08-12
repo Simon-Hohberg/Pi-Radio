@@ -13,6 +13,8 @@ class Backend():
         self.mpc_lock = Lock()
         self.station_file_lock = Lock()
         
+        
+        
         self.stations = self.read_stations()
 
 	for s in self.stations:
