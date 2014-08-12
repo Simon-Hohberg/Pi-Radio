@@ -1,5 +1,6 @@
 var stationList;
 var radio;
+var view;
 
 $(function() {
     $( "#tabs" ).tabs();
@@ -9,23 +10,18 @@ $(function() {
     });
     
     radio = new Radio();
+    view = new ControlsView(radio);
     
     $( "#play" ).click( function() {
         if (radio.isPlaying) {
-            stop( function (data) {
-                $( "#play" ).button({
-                      icons: { primary: "ui-icon-play" },
-                      text: false
-                });
-                radio.isPlaying = false;
+            stop( function() {
+                radio.stopped();
+                view.stopped();
             });
         } else {
-            play( function(data) {
-                $( "#play" ).button({
-                      icons: { primary: "ui-icon-pause" },
-                      text: false
-                });
-                radio.isPlaying = true;
+            play( function(state) {
+                radio.playing(state.station);
+                view.playing();
             });
         }
     });
@@ -39,4 +35,17 @@ $(function() {
     }, function() {
         // TODO error handling
     });
+    
+    
 });
+
+
+function updateRadioState(data) {
+    if (data.station != "") {
+        radio.playing(data.station);
+        view.playing();
+    } else {
+        radio.stopped();
+        view.stopped();
+    }
+}

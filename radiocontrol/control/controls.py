@@ -18,12 +18,12 @@ LED_2 = 24
 STATION_ADC = 0
 VOLUME_ADC = 1
 
-STATION_TOLERANCE = 20
-VOLUME_TOLERACE = 5
+STATION_TOLERANCE = 40
+VOLUME_TOLERACE = 3
 
 class Controls:
     
-    def __init__(self, num_stations=10, num_volume_lvls=20):
+    def __init__(self, num_stations=6, num_volume_lvls=20):
         self.lock = Lock()
         self.update_callback = None
         self.num_stations = num_stations
@@ -114,7 +114,7 @@ class ControlsThread(Thread):
             GPIO.output(LED_1, self.controls.led1)
             GPIO.output(LED_2, self.controls.led2)
             
- #           print(self.controls)
+#             print(self.controls)
             
             self.controls.lock.release()
             

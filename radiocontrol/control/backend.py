@@ -4,6 +4,12 @@ from control.singleton import Singleton
 from threading import Lock
 from control.controls import Controls, ControlsThread
 import os
+import re
+import subprocess as sub
+
+FNULL = open(os.devnull, 'w')
+VOLUME_REGEX = re.compile('Front\sLeft:\sPlayback\s\d+\s\[(\d?\d?\d)%')
+URI_REGEX = re.compile('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+')
 
 @Singleton
 class Backend():
@@ -12,13 +18,22 @@ class Backend():
         
         self.mpc_lock = Lock()
         self.station_file_lock = Lock()
-        
-        
-        
+        self.noise_lock = Lock()
+        self.amixer_lock = Lock()
+        self.noise_process = None
         self.stations = self.read_stations()
-
-	for s in self.stations:
-            os.system('mpc add ' + s[1])
+        
+        # clear playlist
+        sub.call(['mpc', 'clear'])
+        # add all stations from stations file
+        for s in self.stations:
+            uri = s[1]
+            # mpc cannot handle m3u, workaround: parsing the m3u and using first
+            # uri in list
+            if uri.endswith('.m3u'):
+                m3u_data = sub.check_output(['curl', uri])
+                uri = URI_REGEX.findall(m3u_data)[0]
+            sub.call(['mpc', 'add', uri])
         
         # create controls and thread for interfacing
         self.controls = Controls()
@@ -41,7 +56,7 @@ class Backend():
             # expecting csv station file (Station Name,URL)
             for line in stations_file:
                 splitted = line.split(',')
-                station_list.append((splitted[0], splitted[1]))
+                station_list.append((splitted[0].strip(), splitted[1].strip()))
             stations_file.close()
         except IOError:
             station_list = []
@@ -90,13 +105,25 @@ class Backend():
     
     # -------- Play -----------------------------------------------------------
     def switch_station(self, new_station):
+        print 'switching to station: ' + str(new_station)
         if new_station == 0:
-            # TODO: play noise
-            True;
+            self.stop()
+            # > lock
+            self.noise_lock.acquire()
+            self.noise_process = sub.Popen(['play', 'radio-noise.ogg', 'repeat'])
+            # < release
+            self.noise_lock.release()
         else:
+            if self.noise_process is not None:
+                # > lock
+                self.noise_lock.acquire()
+                self.noise_process.kill()
+                self.noise_process = None
+                # < release
+                self.noise_lock.release()
             # > lock
             self.mpc_lock.acquire()
-            mpc = os.popen("mpc play " + str(new_station))
+            sub.call(['mpc', 'play', str(new_station)], stdout=FNULL)
             # < release
             self.mpc_lock.release()
     
@@ -119,39 +146,47 @@ class Backend():
     def stop(self):
         # > lock
         self.mpc_lock.acquire()
-        os.system("mpc stop")
+        sub.call(['mpc', 'stop'], stdout=FNULL)
         # < release
         self.mpc_lock.release()
     
     
     # -------- Volume ---------------------------------------------------------
     def set_volume(self, new_volume):
-        self.mpc_lock.acquire()
-        os.system("mpc volume " + str(new_volume))
-        self.mpc_lock.release()
+        # > lock
+        self.amixer_lock.acquire()
+        sub.call(['amixer', '-c', '0', 'sset', 'Headphone', str(new_volume) + '%'], stdout=FNULL)
+        # < release
+        self.amixer_lock.release()
     
     def get_volume(self):
-        self.mpc_lock.acquire()
-        mpc = os.popen("mpc volume")
-        volume = mpc.read().replace("volume:", "").strip()
-        self.mpc_lock.release()
+        # > lock
+        self.amixer_lock.acquire()
+        amixer = sub.check_output(['amixer', '-c', '0', 'sget', 'Headphone'])
+        # < release
+        self.amixer_lock.release()
+        volume = VOLUME_REGEX.findall(amixer)[0]
         return volume
     
     
     # -------- Audio Source ---------------------------------------------------
     def set_ext_audio_source(self, use_external):
+        # > lock
+        self.amixer_lock.acquire()
         if use_external:
-            # TODO:
-            True;
+            self.stop()
+            sub.call(['amixer', 'sset', 'Mic', 'Playback', 'unmute'])
         else:
-            # TODO:
-            True;
+            sub.call(['amixer', 'sset', 'Mic', 'mute'])
+            self.play()
+        # < release
+        self.amixer_lock.release()
     
     
     # -------- Station --------------------------------------------------------
     def get_current_station(self):
         self.mpc_lock.acquire()
-        mpc = os.popen("mpc current")
-        station = mpc.read().strip()
+        mpc = sub.check_output(['mpc', 'current'])
+        station = mpc.strip()
         self.mpc_lock.release()
         return station
