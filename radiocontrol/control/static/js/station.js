@@ -1,8 +1,17 @@
 function Station(index, name, uri) {
     var self = this;
-    
-    this.setLabel = function (text) {
-        $( "label", this.widget ).text( text );
+
+    this.setIndex = function(zeroBasedIndex) {
+        this.index = zeroBasedIndex;
+        $( "label", this.widget ).text( (zeroBasedIndex + 1) + " - " );
+    };
+
+    this.setName = function(text) {
+        $( ".radio-name", this.widget ).val( text );
+    };
+
+    this.setUri = function(uri) {
+        $( ".radio-uri", this.widget ).val( uri );
     };
     
     this.remove = function () {
@@ -15,24 +24,21 @@ function Station(index, name, uri) {
         });
     };
     
-    this.getURI = function() {
-        return $("#radio-uri", this.widget).val();
+    this.getUri = function() {
+        return $(".radio-uri", this.widget).val();
     };
     
     this.getName = function() {
-        return $("#radio-name", this.widget).val();
+        return $(".radio-name", this.widget).val();
     };
-    
-    this.index = index;
-    
+
     this.widget = $( "#station-template" ).clone();
     this.widget.css( "display", "block" );
     this.widget.removeAttr( "id" );
     $( "#station-list" ).append( this.widget );
     
-    $("#radio-name", this.widget).val(name);
-    $("#radio-uri", this.widget).val(uri);
+    this.setName(name);
+    this.setUri(uri);
     
-    // TODO add on change listener or introduce "apply" button
-    this.setLabel((index + 1) + " - ");
+    this.setIndex(index);
 }

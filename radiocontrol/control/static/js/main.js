@@ -26,12 +26,12 @@ $(function() {
         }
     });
     
-    // start polling the radio state
-    window.setInterval("getRadioState(updateRadioState)", 5000);
+    // start polling the radio state and system info
+    window.setInterval("getRadioState(updateRadioState)", 2000);
+    window.setInterval("getSystemInfo(updateSystemInfo)", 5000);
     
     getStationList(function(data) {
-        // TODO how to handle max?
-        stationList = new StationList(data, 10);
+        stationList = new StationList(data);
     }, function() {
         // TODO error handling
     });
@@ -48,4 +48,9 @@ function updateRadioState(data) {
         radio.stopped();
         view.stopped();
     }
+    console.log(data.volume);
+}
+
+function updateSystemInfo(data) {
+    view.setSystemInfo(data);
 }

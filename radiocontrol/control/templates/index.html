@@ -6,18 +6,18 @@
     {% load staticfiles %}
     {% csrf_token %}
 
-    <link rel="stylesheet" href="{% static "jquery-ui-1.10.3.custom/css/smoothness/jquery-ui-1.10.3.custom.min.css" %}" media="screen, projection"/>
-    <link rel="stylesheet" href="{% static "css/radio.css" %}" media="screen, projection"/>
+    <link rel="stylesheet" href="{% static 'jquery-ui-1.10.3.custom/css/smoothness/jquery-ui-1.10.3.custom.min.css' %}" media="screen, projection"/>
+    <link rel="stylesheet" href="{% static 'css/radio.css' %}" media="screen, projection"/>
 
-    <script src="{% static "jquery-ui-1.10.3.custom/js/jquery-1.9.1.js" %}"></script>
-    <script src="{% static "jquery-ui-1.10.3.custom/js/jquery-ui-1.10.3.custom.min.js" %}"></script>
-    <script src="{% static "jquery-cookie/jquery.cookie.js" %}"></script>
-    <script src="{% static "js/radio.js" %}"></script>
-    <script src="{% static "js/comm.js" %}"></script>
-    <script src="{% static "js/stationList.js" %}"></script>
-    <script src="{% static "js/station.js" %}"></script>
-    <script src="{% static "js/view.js" %}"></script>
-    <script src="{% static "js/main.js" %}"></script>
+    <script src="{% static 'jquery-ui-1.10.3.custom/js/jquery-1.9.1.js' %}"></script>
+    <script src="{% static 'jquery-ui-1.10.3.custom/js/jquery-ui-1.10.3.custom.min.js' %}"></script>
+    <script src="{% static 'jquery-cookie/jquery.cookie.js' %}"></script>
+    <script src="{% static 'js/radio.js' %}"></script>
+    <script src="{% static 'js/comm.js' %}"></script>
+    <script src="{% static 'js/stationList.js' %}"></script>
+    <script src="{% static 'js/station.js' %}"></script>
+    <script src="{% static 'js/view.js' %}"></script>
+    <script src="{% static 'js/main.js' %}"></script>
 
 </head>
 <body>
@@ -30,36 +30,52 @@
         </div>
         <div id="control-info" class="marquee fake centered-header-elem" style="float: left">
             <div class="floater">
-                <span id="info-text" class="info-text">// Now playing // Fritz Radio...</span>
+                <span id="info-text" class="info-text">// Loading data ... //</span>
             </div>
         </div>
     </div>
 
     <div id="tabs" style="clear: both">
-         <ul>
-             <li><a href="#radio-stations">Radio Stations</a></li>
-             <li><a href="#tabs-2">Settings</a></li>
-             <li><a href="#tabs-3">Status</a></li>
-         </ul>
-         
-         <div id="radio-stations">
-                <ul id="station-list" style="list-style-type: none; ">
-                    <li class="ui-state-default" id="station-template" style="display: none">
-                        <label>Template</label>
-                        <input type="text" style="radio-name" />
-                        <input type="text" style="radio-uri" />
+        <ul>
+            <li><a href="#radio-stations">Radio Stations</a></li>
+            <li><a href="#settings">Settings</a></li>
+            <li><a href="#system-info">System Info</a></li>
+        </ul>
+             <!-- Stations -->
+        <div id="radio-stations">
+            <div style="margin-bottom: 2em; padding-left: 2em">
+                <ul id="station-list" style="list-style-type: none; padding: 0">
+                    <li class="ui-state-default" id="station-template" style="display: none; margin: 0.5em 0 0.5em 0">
+                        <label style="display: inline-block; width: 2em; text-align: right">Template</label>
+                        <input type="text" class="radio-name" />
+                        <input type="text" class="radio-uri" />
                         <button style="float: right; background: none; border: none; cursor: pointer">
                             <span class="ui-icon ui-icon-close"></span>
                         </button>
                     </li>
                 </ul>
-         </div>
-         
-         <div id="tabs-2">
-         </div>
-         
-         <div id="tabs-3">
-         </div>
+               <button id="add-station-button" style="cursor: pointer; width: 1.5em; height: 1.5em;"></button>
+            </div>
+            <button id="apply-station-list-button" style="cursor: pointer">Apply</button>
+            <button id="reset-station-list-button" style="cursor: pointer">Reset</button>
+        </div>
+            <!-- System Info -->
+        <div id="system-info">
+           <ul>
+               <li>
+                   <label>Internet</label>
+                   <span id="internet-connection"></span>
+               </li>
+               <li>
+                   <label>CPU</label>
+                   <span id="cpu-freq"></span>
+                   <span id="cpu-temp"></span>
+               </li>
+           </ul>
+        </div>
+             <!-- Settings -->
+        <div id="settings">
+             </div>
     </div>
 </body>
 </html>

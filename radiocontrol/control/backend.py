@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from control.singleton import Singleton
 from threading import Lock
 from control.controls import Controls, ControlsThread
@@ -5,6 +6,8 @@ import control.utils as utils
 import os
 import re
 import subprocess as sub
+import json
+import codecs
 
 FNULL = open(os.devnull, 'w')
 VOLUME_REGEX = re.compile('Front\sLeft:\sPlayback\s\d+\s\[(\d?\d?\d)%')
@@ -50,10 +53,14 @@ class Backend():
         self.controls.set_update_callback(self.update)
         controls_thread = ControlsThread(self.controls)
         controls_thread.start()
+        self.controls.set_leds_on()
         
         # start the radio when online
         if not self.offline:
             self.play()
+        else:
+            utils.say('Hi, this is your Pi Radio. I set up a wifi network for you to configure my wifi settings. Please connect to ' + utils.AD_HOC_NAME + ', then open a browser and go to ' + utils.AD_HOC_ADDR + '.')
+
     
     
     def load_stations(self, stations):
@@ -130,15 +137,20 @@ class Backend():
         self.stations = station_list
         # > lock
         self.station_file_lock.acquire()
+
+        print station_list
         
         # creates file, overwrites old file
-        stations_file = open(stations_file_name, 'w+')
-        for station in station_list:
-            stations_file.write(station[0] + ',' + station[1] + '\n')
-        stations_file.close();
+        with codecs.open(stations_file_name, 'w+', 'utf-8-sig') as stations_file:
+            for station in station_list:
+                stations_file.write(station[0] + ',' + station[1] + '\n')
+            stations_file.close();
         
         # < release
         self.station_file_lock.release()
+        self.stop()
+        self.load_stations(self.stations)
+        self.play()
     
     
     def get_station_list(self):
@@ -190,6 +202,7 @@ class Backend():
                 self.noise_process.kill()
             # start new process playing noise
             self.noise_process = sub.Popen(['play', 'radio-noise.ogg', 'repeat'])
+            self.controls.set_leds_random()
             # < release
             self.noise_lock.release()
         else:
@@ -201,6 +214,7 @@ class Backend():
                 self.noise_process = None
                 # < release
                 self.noise_lock.release()
+            self.controls.set_leds_on()
             # > lock
             self.mpc_lock.acquire()
             # switch to new station
@@ -316,3 +330,16 @@ class Backend():
         station = mpc.strip()
         self.mpc_lock.release()
         return station
+
+
+    # -------- System Info ----------------------------------------------------
+    def get_system_info(self):
+        '''
+        Get info about the Pi like cpu frequency, temperature and internet
+        connectivity.
+        Thread safe.
+        @return: Dictionary containing infos about the Pi
+        '''
+        system_stats = json.loads(sub.check_output(['/home/pi/utils/sys_stats.sh']))
+        system_stats['offline'] = self.offline
+        return system_stats

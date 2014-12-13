@@ -48,6 +48,28 @@ function getRadioState(callback) {
 }
 
 
+// ------------------------------- system info --------------------------------
+
+function getSystemInfo(callback) {
+    $.get(
+        "systemInfo/",
+        {},
+        callback
+    );
+}
+
+
+// ------------------------------- volume -------------------------------------
+
+function getVolume(callback) {
+    $.get(
+        "volume/",
+        {},
+        callback
+    );
+}
+
+
 // ------------------------------- radio control -------------------------------
 
 function play(callback) {

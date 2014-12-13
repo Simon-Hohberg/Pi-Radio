@@ -1,8 +1,10 @@
+# -*- coding: utf-8 -*-
 from django.http import HttpResponse
 from django.shortcuts import render
 import json
 import string
 from control.backend import Backend
+from control.backend import STATIONS_FILE
 
 def index(request):
     return render(request, template_name='index.html')
@@ -41,7 +43,7 @@ def station_list(request):
 def update_station_list(request):
     if request.method == "POST":
         station_list = json.loads(request.raw_post_data)
-        Backend.Instance().write_stations(station_list)
+        Backend.Instance().write_stations(station_list, STATIONS_FILE)
         return HttpResponse(status=200)
     return HttpResponse(status=400)
 
@@ -50,3 +52,9 @@ def update_station_list(request):
 def volume(request):
     volume = Backend.Instance().get_volume()
     return HttpResponse(json.dumps(volume), mimetype="application/json")
+
+
+# -------- System Info ----------------------------------------------------
+def system_info(request):
+    stats = Backend.Instance().get_system_info()
+    return HttpResponse(json.dumps(stats), mimetype="application/json")

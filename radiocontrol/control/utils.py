@@ -4,11 +4,13 @@ import re
 PACKET_LOSS_REGEX = re.compile('(\d)%\spacket\sloss')
 URI_REGEX = re.compile('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+')
 
+AD_HOC_NAME = 'PI-RADIO'
+AD_HOC_ADDR = '192.168.1.222'
 AD_HOC_CONF = [ 'iface wlan0 inet static\n',
-                '\taddress 192.168.1.222\n',
+                '\taddress ' + AD_HOC_ADDR + '\n',
                 '\tnetmask 255.255.255.0\n',
                 '\twireless-channel 1\n',
-                '\twireless-essid PI-RADIO\n',
+                '\twireless-essid ' + AD_HOC_NAME + '\n',
                 '\twireless-mode ad-hoc\n' ]
 
 
@@ -21,7 +23,7 @@ def check_inet_connection():
     '''
     # try to quietly ping fff.org three times with a deadline of 5s
     try:
-        ping_output = sub.check_output(['ping', '-q', '-c', '3', '-w', '5', 'fff.org'])
+        ping_output = sub.check_output(['ping', '-q', '-c', '3', '-w', '5', 'example.org'])
     except sub.CalledProcessError:
         return 100
     # get packet loss in %
@@ -75,3 +77,7 @@ def setup_ad_hoc():
     ifaces_file.writelines(ifaces_data)
     
     sub.call(['ifup', 'wlan0'])
+
+
+def say(text):
+    sub.call('espeak -a 150 -s 120 "' + text + '" --stdout | aplay')

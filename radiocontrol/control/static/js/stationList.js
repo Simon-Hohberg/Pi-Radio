@@ -1,7 +1,7 @@
-function StationList(data, stationMax) {
+function StationList(data) {
     
     var self = this;
-    
+
     this.addStation = function (name, uri) {
         if (this.stations.length < this.max) {
             var station = new Station(this.stations.length, name, uri);
@@ -17,9 +17,8 @@ function StationList(data, stationMax) {
         removedStation.remove();
         for ( var i = index + 1; i < self.stations.length; i++ ) {
             var station = self.stations[i];
-            station.setLabel( i + " - " );
+            station.setIndex(i - 1);
             self.stations[i - 1] = station;
-            station.index = i - 1;
         }
         self.stations.pop();
     };
@@ -27,10 +26,31 @@ function StationList(data, stationMax) {
     this.getURIList = function() {
         var list = [];
         for (var i = 0; i < self.stations.length; i++) {
-            list.push(self.stations[i].getURI());
+            list.push(self.stations[i].getUri());
         }
         return list;
     };
+
+    this.reload = function(data) {
+        for ( var i = 0; i < self.stations.length; i++ ) {
+            this.stations[i].remove()
+        }
+        this.stations = [];
+        for (var i = 0; i < data.length; i++) {
+            this.addStation(data[i][0], data[i][1]);
+        }
+    };
+
+    this.toArray = function() {
+        var arr = new Array(this.stations.length);
+        for (var i = 0; i < this.stations.length; i++) {
+            var station = this.stations[i];
+            arr[i] = new Array(2);
+            arr[i][0] = station.getName();
+            arr[i][1] = station.getUri();
+        }
+        return arr;
+    }
     
     $( "#station-list" ).sortable({
         start: function(event, ui) {
@@ -48,24 +68,17 @@ function StationList(data, stationMax) {
                 for (var i = startPos + 1; i <= index; i++) {
                     var station = self.stations[i];
                     self.stations[i - 1] = station;
-                    station.index = i - 1;
-                    $("label", station.widget).text( i + " - " );
+                    station.setIndex(i - 1)
                 }
             } else {
                 for (var i = startPos - 1; i >= index; i--) {
                     var station = self.stations[i];
                     self.stations[i + 1] = station;
-                    station.index = i + 1;
-                    $("label", station.widget).text( (i + 2) + " - " );
+                    station.setIndex(i + 1);
                 }
             }
-            
+            movedStation.setIndex(index);
             self.stations[index] = movedStation;
-            $( "label", movedStation.widget ).text( (index + 1) + " - " );
-            
-            sendStationList(self.getURIList(), function() {
-               // TODO error handling 
-            });
         },
         
         update: function(event, ui) {
@@ -74,10 +87,8 @@ function StationList(data, stationMax) {
     });
     
     this.stations = [];
-    this.max = stationMax;
-    for (var i = 0; i < data.length; i++) {
-        this.addStation(data[i][0], data[i][1]);
-    }
+    this.max = 10;
+    this.reload(data);
     
     $( "#station-list" ).disableSelection();
 }

@@ -9,6 +9,7 @@ urlpatterns = patterns('',
     url(r'^radioState/$', views.radio_state, name='radio_state'),
     url(r'^updateStationList/$', views.update_station_list, name='update_station_list'),
     url(r'^stationList/$', views.station_list, name='station_list'),
+    url(r'^systemInfo/$', views.system_info, name='system_info'),
 
     url(r'^$', views.index, name='index'),
 )
